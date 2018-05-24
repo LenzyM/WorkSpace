@@ -1,10 +1,14 @@
-package FamilyAccount;
+//主类
+
 import java.util.Scanner;
+import java.io.*;
 
 public class FamilyAccount
 {
     Scanner scanner = new Scanner(System.in);
-    Account account = new Account(10000);
+    Account account;
+    Account account2 = new Account(10000);  //用于数据文件的初始化
+    File file = new File("account_data.txt");
 
     //main方法，取得所在类的一个实例，调用实质上的主方法，程序开始
     public static void main(String[] args) {
@@ -13,7 +17,27 @@ public class FamilyAccount
     }
     
     /*实质上的主方法，统领其余方法*/
-    public void mainMenu() {
+    public void mainMenu() {		
+    	
+    	//首先尝试读入Account对象
+    	try {
+    		//如果数据文件不存在，则创建并初始化
+    		if (!file.exists()) {
+    			file.createNewFile();
+    			System.out.println("首次使用，创建文件成功！");
+    			fileInitialize();  //初始化文件
+    		}
+    		//读入对象
+    		ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
+    		System.out.println("已读入");
+    		account = (Account)in.readObject();
+    		in.close();
+    		
+    	} catch (Exception e) {
+			System.out.println("Something error when creating file or reading file...\nExited.");
+			System.exit(0);
+		}
+    	
         int option;
         boolean loopFlag = true;
         
@@ -37,9 +61,33 @@ public class FamilyAccount
                 default: System.out.println("需要一个选项(1-4)，请重试。"); break;
             }
         }
+        
+        //保存文件
+        try {
+        	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+        	out.writeObject(account);
+        	System.out.println("已保存");
+        	out.close();
+        } catch (Exception e) {
+        	System.out.println("Something error when writing file...\nExited.");
+		}
+        
         System.out.println("已退出。");  //程序成功退出的提示
     }
 
+    //文件初始化
+    private void fileInitialize() {
+    	try {
+        	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+        	out.writeObject(account2);
+        	System.out.println("初始化成功！");
+        	out.close();
+        } catch (Exception e) {
+        	System.out.println("Something error when initialize file...\nExited.");
+        	System.exit(0);
+		}
+    }
+    
     //打印菜单
     public void menu() {
         System.out.println("-----------------家庭收支记账软件-----------------");

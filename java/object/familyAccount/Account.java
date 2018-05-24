@@ -1,6 +1,8 @@
-package FamilyAccount;
+import java.io.Serializable;
 
-public class Account
+//Account类
+
+public class Account implements Serializable
 {
     private double balance;
     private StringBuffer details = new StringBuffer("收支\t账户金额\t收支金额\t说  明\n");
